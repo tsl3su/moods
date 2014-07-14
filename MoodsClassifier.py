@@ -5,9 +5,10 @@ import string
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
+from collections import defaultdict
 
 # insert tweets hur
-tweets = ["i ##eat acorns and eggs for #breakfast"]
+tweets = ["i ##eat acorns and eggs for #breakfast", "hamburgers!", "hotdogs!", "i ##eat acorns and eggs for #breakfast", "i ##eat acorns and eggs for #breakfast"]
 
 # 12 different emotion types
 _emotions = {
@@ -41,11 +42,9 @@ def scoreWord(word):
 
 
 	global anew
-
 	#gives stem of word/ lemmatized
 	stWord = lmtzr.lemmatize(word)
 	print 'the word is', word, 'all other versions are', stWord
-
 	if word in anew:
 		# print word
 		valenceMeanSum = float(anew[word]['V.Mean.Sum'])
@@ -55,7 +54,6 @@ def scoreWord(word):
 		valenceMeanSum = float(anew[stWord]['V.Mean.Sum'])
 		arousalMeanSum = float(anew[stWord]['A.Mean.Sum'])
 		return (valenceMeanSum, arousalMeanSum,stWord)
-
 	# elif stWord + ed in anew:
 	# 	valenceMeanSum = float(anew[stWord]['V.Mean.Sum'])
 	# 	arousalMeanSum = float(anew[stWord]['A.Mean.Sum'])
@@ -76,15 +74,39 @@ def scoreEmo(score):
 	print round((scoreAngle(score))*6)
 	return (score[2],_emotions[round(scoreAngle(score)*6)%12])
 
+def stop_filter(words):
+	stopless = []
+	stops =['i', 'me', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', \
+	'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she' \
+	'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', \
+	'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', \
+	'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', \
+	'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', \
+	'as', 'unti;', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', \
+	'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', \
+	'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', \
+	'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', \
+	'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', \
+	'don', 'should', 'now']
+	for word in words.split():
+		if word not in stops:
+			stopless.append(word)
+	return stopless
+
 def tweetCat(tweets):
 	tweets = [tweet.translate(None, string.punctuation).split() for tweet in tweets]
 	# print tweets
 	allemotions = []
 	for tweet in tweets:
-		print tweet
+		emotionCounter.update(tweet)
+		# for item in wordcount.items(): print("{}\t{}".format(*item))
+		# print "******"
+		# print tweet
 		emotions = map(scoreEmo,filter(None,map(scoreWord,tweet)))
 		allemotions.append(emotions)
-		yield  emotions
+		print stop_filter(emotionCounter)
+		print "*************************************"
+		yield emotions
 
 
 
@@ -98,6 +120,7 @@ with open('ANEWwordbank.csv', 'rb') as f:
 results =  tweetCat(tweets)
 for r in results:
 	print(r)
+
 
 
 

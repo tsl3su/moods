@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+	<meta charset='utf-8'/>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="counts.css">
+</head>
+
+<body>
+<div id='console'>
+</div>
+	<script>
+
+	var object;
+	var display = '';
+	setInterval(function(){
+		display = '';
+		var thing = $.getJSON('emotionsCounts.txt')
+			.done(function(parsedResponse, statusText, jqXhr){
+				object = JSON.parse(jqXhr.responseText);
+				console.log(object);
+				console.log(object["Content"]);
+				maxval=0;
+			Object.keys(object).forEach(function(key){
+				if(object[key]>maxval)maxval=object[key];
+			});
+			$('div#console').empty();
+			Object.keys(object).forEach(function(key){
+				d = object[key];
+				width = 100.0*d/maxval;
+				$('div#console').append($('<div></div>',{'style':"width:"+Math.log(width)+"%;background-color:blue"}).html(key+' '+d));
+			});
+			});
+
+	},1000);
+
+	</script>
+
+</body>
+
+</html>

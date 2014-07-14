@@ -1,3 +1,5 @@
+from collections import Counter
+
 """Straight forward Emoji Classifier:
 
 If (UTF-8) encrypted Emoji code is found within a String,
@@ -5,6 +7,8 @@ return the Emoji Type.
 
 Upon Update -- Map numerical values to sentimental values
 """
+
+emojiCounter = Counter()
 
 _emojis = {
 	"\xF0\x9F\x98\x83": "Happy",		# \xF0\x9F\x98\x83 - Happy [1500]
@@ -18,7 +22,7 @@ _emojis = {
 	"\xF0\x9F\x98\x8A": "Pleasant"	# \xF0\x9F\x98\x8A - smiling face with smiling eyes [1460]
 }
 
-tweet = "hello, I #like to eat\xF0\x9F\x98\x83\xF0\x9F\x98\x83\xF0\x9F\x98\x83!!!!! \xF0\x9F\x98\xA2\xF0\x9F\x98\x84"
+tweet = "hello, I #like to eat \xF0\x9F\x98\xA2 \xF0\x9F\x98\x84"
 
 def search(tweet):
 	for key in _emojis.keys():
@@ -27,11 +31,14 @@ def search(tweet):
 		# yield emojis
 		if key in tweet:
 			# print "key: %s, value: %s" % (key, _emojis[key])
-			yield (key, _emojis[key])
+			yield _emojis[key]
+			print _emojis[key]
 		# else: return False
 
 
 # search(tweet)
 results =  search(tweet)
 for r in results:
+	emojiCounter[r]+=1
 	print(r)
+print emojiCounter.most_common(5)
